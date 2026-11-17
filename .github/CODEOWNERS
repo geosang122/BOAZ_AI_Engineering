@@ -1,0 +1,28 @@
+# 폴더별 담당. PR이 이 폴더를 건드리면 담당자에게 리뷰 요청이 자동으로 간다.
+# @LEADER, @ROLE1~4를 실제 GitHub 아이디로 바꾼다. 뒤에 오는 줄이 앞의 줄을 덮는다.
+# 계약(contracts/) 승인은 .github/workflows/contracts-approval.yml이 강제한다.
+
+*                         @LEADER
+
+/agent/                   @ROLE1
+/data/                    @ROLE1
+/scripts/run_agent.py     @ROLE1
+
+/telemetry/               @ROLE2
+/infra/                   @ROLE2
+/docker-compose.yml       @ROLE2
+/README.md                @ROLE2
+/scripts/up.py            @ROLE2
+/scripts/down.py          @ROLE2
+
+/storage/                 @ROLE3
+/scripts/transform.py     @ROLE3
+/scripts/seed_data.py     @ROLE3
+
+/eval/                    @ROLE4
+/dashboard/               @ROLE4
+/scripts/evaluate.py      @ROLE4
+
+/contracts/               @LEADER
+/fixtures/                @LEADER
+/tests/test_contracts.py  @LEADER

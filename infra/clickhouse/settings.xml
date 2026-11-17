@@ -1,0 +1,9 @@
+<!-- contracts/tables.sql에는 엔진 절이 없다 (DuckDB와 같은 파일을 쓰려고). 여기서 MergeTree를 기본으로 준다. -->
+<clickhouse>
+    <profiles>
+        <default>
+            <default_table_engine>MergeTree</default_table_engine>
+            <create_table_empty_primary_key_by_default>1</create_table_empty_primary_key_by_default>
+        </default>
+    </profiles>
+</clickhouse>

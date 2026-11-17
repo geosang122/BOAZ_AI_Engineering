@@ -1,0 +1,35 @@
+[project]
+name = "agentscope"
+version = "0.1.0"
+description = "QA Agent 실행 Span × HotpotQA 정답 조인: HTTP 200인데 틀린 답과 그 원인 측정"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "pydantic>=2.11",
+    "httpx>=0.28",
+    "python-dotenv>=1.0",
+    "opentelemetry-sdk>=1.30",
+    "opentelemetry-exporter-otlp-proto-http>=1.30",
+    "duckdb>=1.2",
+    "clickhouse-connect>=0.8",
+]
+
+[dependency-groups]
+# ruff 버전은 .pre-commit-config.yaml의 rev와 같게 맞춘다
+dev = ["pytest>=8", "ruff==0.17.3", "pre-commit>=4"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["contracts", "agent", "data", "telemetry", "storage", "eval"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

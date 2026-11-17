@@ -1,0 +1,8 @@
+# 한 번만: uv run pre-commit install  → 커밋할 때마다 ruff가 자동으로 돈다
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3  # pyproject.toml의 ruff 버전과 같게
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format

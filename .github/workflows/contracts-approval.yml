@@ -1,0 +1,35 @@
+# contracts/를 바꾸는 PR은 리더가 승인해야 통과한다 (리더가 직접 연 PR은 통과).
+# main 보호 규칙에서 이 검사(leader-approved)를 필수로 지정한다. CONTRIBUTING.md 참고.
+name: contracts-approval
+on:
+  pull_request:
+  pull_request_review:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  leader-approved:
+    runs-on: ubuntu-latest
+    env:
+      LEADER: LEADER_GITHUB_ID  # TODO: 리더의 GitHub 아이디로 바꾼다
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+      AUTHOR: ${{ github.event.pull_request.user.login }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: contracts/가 바뀌었으면 리더 승인 확인
+        run: |
+          if ! gh pr diff "$PR" -R "$REPO" --name-only | grep -q '^contracts/'; then
+            echo "contracts/ 변경 없음"; exit 0
+          fi
+          if [ "$AUTHOR" = "$LEADER" ]; then
+            echo "리더가 연 PR"; exit 0
+          fi
+          if gh api "repos/$REPO/pulls/$PR/reviews" --paginate \
+               --jq '.[] | select(.state == "APPROVED") | .user.login' | grep -qx "$LEADER"; then
+            echo "리더 승인 확인"
+          else
+            echo "::error::contracts/ 변경은 리더($LEADER) 승인이 필요하다"; exit 1
+          fi

@@ -1,0 +1,26 @@
+{
+  "uid": "agentscope",
+  "title": "AgentScope",
+  "schemaVersion": 41,
+  "editable": true,
+  "time": { "from": "now-7d", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "실행별 결과: HTTP 200인데 틀린 답",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+          "editorType": "sql",
+          "queryType": "table",
+          "format": 1,
+          "rawSql": "SELECT q.run_id AS run_id, count() AS questions, round(avg(e.em), 3) AS em, round(avg(e.f1), 3) AS f1, countIf(q.all_http_200 AND e.em = 0) AS ok200_wrong, countIf(e.failure_type = 'wrong_retrieval') AS wrong_retrieval, countIf(e.failure_type = 'wrong_reasoning') AS wrong_reasoning, countIf(e.failure_type = 'correct_memorized') AS memorized FROM mart_run_question AS q INNER JOIN mart_eval AS e ON q.run_id = e.run_id AND q.question_id = e.question_id GROUP BY q.run_id ORDER BY q.run_id DESC"
+        }
+      ]
+    }
+  ]
+}

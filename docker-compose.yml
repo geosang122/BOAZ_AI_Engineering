@@ -1,0 +1,57 @@
+# 서버 3개: Agent → Collector(:4318) → ClickHouse(:8123, :9000) → Grafana(:3000)
+# 켜기: uv run python scripts/up.py   끄기: uv run python scripts/down.py
+# ${...} 값은 저장소 루트의 .env에서 온다.
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.8.34.13
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./infra/clickhouse/settings.xml:/etc/clickhouse-server/users.d/agentscope.xml:ro
+      # 처음 뜰 때 한 번만 실행된다. 계약 테이블이 바뀌면 down.py --volumes 후 다시 up.
+      - ./contracts/tables.sql:/docker-entrypoint-initdb.d/tables.sql:ro
+      - clickhouse-data:/var/lib/clickhouse
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8123/ping"]
+      interval: 3s
+      retries: 20
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.164.0
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    ports:
+      - "4318:4318"
+    volumes:
+      - ./infra/collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    depends_on:
+      clickhouse: { condition: service_healthy }
+
+  grafana:
+    image: grafana/grafana:13.3.0
+    environment:
+      GF_PLUGINS_PREINSTALL_SYNC: grafana-clickhouse-datasource@4.23.2
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infra/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/clickhouse.yaml:ro
+      - ./dashboard/provider.yaml:/etc/grafana/provisioning/dashboards/agentscope.yaml:ro
+      - ./dashboard/alerts.yaml:/etc/grafana/provisioning/alerting/agentscope.yaml:ro
+      - ./dashboard:/var/lib/grafana/dashboards:ro
+    depends_on:
+      clickhouse: { condition: service_healthy }
+
+volumes:
+  clickhouse-data:

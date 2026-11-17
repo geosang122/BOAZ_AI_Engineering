@@ -1,0 +1,5 @@
+# 모든 텍스트 파일을 LF로 통일 (Mac/Windows가 섞인 팀)
+* text=auto eol=lf
+*.parquet binary
+*.duckdb binary
+*.png binary

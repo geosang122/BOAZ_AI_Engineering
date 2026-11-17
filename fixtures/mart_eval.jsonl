@@ -1,0 +1,4 @@
+{"run_id":"20261118_mock_toolcall_090000","question_id":"5a8b57f25542995d1e6f1371","em":1.0,"f1":1.0,"failure_type":"correct_grounded"}
+{"run_id":"20261118_mock_toolcall_090000","question_id":"5a8c7595554299585d9e36b6","em":1.0,"f1":1.0,"failure_type":"correct_memorized"}
+{"run_id":"20261118_mock_toolcall_090000","question_id":"5a85ea095542994775f606a8","em":0.0,"f1":0.0,"failure_type":"wrong_retrieval"}
+{"run_id":"20261118_mock_toolcall_090000","question_id":"5adbf0a255429947ff17385a","em":0.0,"f1":0.0,"failure_type":"wrong_reasoning"}

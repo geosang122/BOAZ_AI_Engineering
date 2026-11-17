@@ -1,0 +1,5 @@
+-- clean_* × gold_* → mart_run_question (한 run_id). ClickHouse와 DuckDB에서 그대로 돈다.
+-- 두 DB 공통 문법만 쓴다: CAST, CASE, COALESCE, count, sum, max, JOIN, 서브쿼리.
+-- 판정 규칙(retrieval_hit, all_http_200)은 contracts/README.md.
+--
+-- TODO(역할3): INSERT INTO mart_run_question SELECT ... WHERE run_id = '{run_id}'

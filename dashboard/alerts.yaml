@@ -1,0 +1,41 @@
+# Grafana 알림 규칙 (provisioning). 예시 규칙 하나. 받을 곳(contact point)은 아직 없다: TODO(역할4)
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: agentscope
+    folder: AgentScope
+    interval: 1m
+    rules:
+      - uid: ok200-wrong-rate
+        title: HTTP 200인데 틀린 답 비율 50% 초과
+        condition: C
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        annotations:
+          summary: 어떤 실행에서 HTTP 200인데 틀린 답이 절반을 넘었다
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: clickhouse
+            model:
+              refId: A
+              editorType: sql
+              queryType: table
+              format: 1
+              rawSql: >-
+                SELECT max(rate) AS rate FROM (
+                  SELECT q.run_id, avg(q.all_http_200 AND e.em = 0) AS rate
+                  FROM mart_run_question AS q INNER JOIN mart_eval AS e
+                    ON q.run_id = e.run_id AND q.question_id = e.question_id
+                  GROUP BY q.run_id)
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [0.5] } }]

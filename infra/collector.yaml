@@ -1,0 +1,29 @@
+# OTel Collector: Agent의 Span(OTLP/HTTP :4318)을 받아 ClickHouse otel_traces에 넣는다.
+# otel_traces는 exporter가 기본 모양으로 만든다 (create_schema). 직접 정의하지 않는다.
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+
+exporters:
+  clickhouse:
+    endpoint: tcp://${env:CLICKHOUSE_HOST}:9000?dial_timeout=10s
+    database: default
+    username: ${env:CLICKHOUSE_USER}
+    password: ${env:CLICKHOUSE_PASSWORD}
+    create_schema: true
+    traces_table_name: otel_traces
+    timeout: 10s
+    retry_on_failure:
+      enabled: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [clickhouse]
