@@ -12,5 +12,5 @@
 | `metrics.py` | HotpotQA 공식 정규화, EM, F1 (TODO) |
 | `classify.py` | `classify()`, `score_run()`, `print_report()` (TODO) |
 
-정답 기준: TODO — EM=1로 할지 F1 문턱으로 할지 정해서 여기에 적는다.
+정답 기준: **EM=1** (공식 정규화 후 완전 일치). 바꾸려면 `classify.score_run`의 `correct=` 한 줄.
 실패 유형 판정표는 `contracts/README.md`.
